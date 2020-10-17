@@ -1,45 +1,51 @@
 import React from "react";
 import { HotTable } from "@handsontable/react";
+import { Tickers } from "../api/agent";
 
 export default function Table() {
   const [data, setData] = React.useState<any>([]);
-  const [headers, setHeaders] = React.useState<any>([]);
-  const [ticker, setTicker] = React.useState<string>("movi3");
+  const [ticker, setTicker] = React.useState<string>("");
+  const [errorMessage, setErrorMessage] = React.useState<string>("");
 
   React.useEffect(() => {
-    fetch(`./data/${ticker}.json`)
-      .then((res) => res.json())
-      .then((data) => {
-        var dd: any[] = [];
+    console.log("useEffect");
+    const fetchData = async () => {
+      try {
+        const result = await Tickers.get(ticker);
+        var x = getData(result);
 
-        data.forEach((el: any) => {
-          var keys = Object.keys(el);
+        setData(x);
+        setErrorMessage("");
+      } catch (e) {
+        setErrorMessage("Not Found");
+      }
+    };
 
-          //setHeaders(keys);
+    fetchData();
+  }, [ticker]);
 
-          var d: any[] = [];
+  const getData = (jsonObj: any[]) => {
+    return jsonObj.reduce((acc, cur) => {
+      var current = Object.keys(cur).map((x) => cur[x]);
 
-          keys.forEach((x) => {
-            d.push(el[x]);
-          });
-
-          dd.push(d);
-        });
-
-        setData(dd);
-      });
-  });
+      return [...acc, current];
+    }, []);
+  };
 
   return (
     <div id="hot-app">
       <input onChange={(e: any) => setTicker(e.target.value)} />
-      <HotTable
-        data={data}
-        colHeaders={true}
-        rowHeaders={false}
-        width="100%"
-        licenseKey="non-commercial-and-evaluation"
-      />
+      {errorMessage ? (
+        <h2>{errorMessage}</h2>
+      ) : (
+        <HotTable
+          data={data}
+          colHeaders={true}
+          rowHeaders={false}
+          width="100%"
+          licenseKey="non-commercial-and-evaluation"
+        />
+      )}
     </div>
   );
 }
