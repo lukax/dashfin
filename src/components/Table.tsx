@@ -33,18 +33,20 @@ export default function Table() {
   };
 
   return (
-    <div id="hot-app">
+    <div>
       <input onChange={(e: any) => setTicker(e.target.value)} />
       {errorMessage ? (
         <h2>{errorMessage}</h2>
       ) : (
-        <HotTable
-          data={data}
-          colHeaders={true}
-          rowHeaders={false}
-          width="100%"
-          licenseKey="non-commercial-and-evaluation"
-        />
+        <div id="hot-app">
+          <HotTable
+            // data={data}
+            colHeaders={false}
+            rowHeaders={false}
+            settings={{ data: data }}
+            licenseKey="non-commercial-and-evaluation"
+          />
+        </div>
       )}
     </div>
   );
